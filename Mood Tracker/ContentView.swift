@@ -5,7 +5,7 @@
 //  Created by Vinayak Bagdi on 11/17/25.
 //
 
-// finished
+// finished everything
 
 import SwiftUI
 import HealthKit
