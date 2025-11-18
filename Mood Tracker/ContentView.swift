@@ -18,6 +18,7 @@ struct ContentView: View {
     @State private var showingHistory = false
     @State private var userName: String = UserDefaults.standard.string(forKey: "userName") ?? ""
     private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+    @State private var showingChart = false
     
     var body: some View {
         NavigationView {
@@ -62,6 +63,8 @@ struct ContentView: View {
                         Text("Steps: \(healthManager.steps)")
                         Text("Distance: \(String(format: "%.2f", healthManager.distance)) km")
                         Text("Sleep: \(String(format: "%.1f", healthManager.sleep)) hours")
+                        Text("Flights Climbed: \(healthManager.flightsClimbed)")
+
                     }
                     .padding()
                     .background(Color.gray.opacity(0.1))
@@ -83,6 +86,11 @@ struct ContentView: View {
                             showingHistory = true
                         }
                         .buttonStyle(.bordered)
+                        
+                        Button("View Trends Chart") {
+                            showingChart = true
+                        }
+                        .buttonStyle(.bordered)
                     }
                     
                     Spacer()
@@ -92,6 +100,9 @@ struct ContentView: View {
             .navigationTitle("Mood Tracker")
             .sheet(isPresented: $showingHistory) {
                 HistoryView(dataManager: dataManager)
+            }
+            .sheet(isPresented: $showingChart) {
+                ChartView(dataManager: dataManager)
             }
             .onAppear {
                 healthManager.requestAuthorization()
@@ -112,6 +123,7 @@ struct ContentView: View {
             steps: healthManager.steps,
             distance: healthManager.distance,
             sleep: healthManager.sleep,
+            flightsClimbed: healthManager.flightsClimbed,
             mood: selectedMood,
             userId: "",
             userName: userName
@@ -140,6 +152,7 @@ struct ContentView: View {
                         steps: healthManager.steps,
                         distance: healthManager.distance,
                         sleep: healthManager.sleep,
+                        flightsClimbed: healthManager.flightsClimbed,
                         mood: selectedMood,
                         userId: "",
                         userName: userName
@@ -163,7 +176,7 @@ struct HistoryView: View {
                     Text(entry.date, style: .date)
                         .font(.headline)
                     Text("\(entry.userName) - Mood: \(entry.mood)/5 | Steps: \(entry.steps)")
-                    Text("Sleep: \(String(format: "%.1f", entry.sleep))h | Distance: \(String(format: "%.1f", entry.distance))km")
+                    Text("Sleep: \(String(format: "%.1f", entry.sleep))h | Distance: \(String(format: "%.1f", entry.distance))km | Flights: \(entry.flightsClimbed)")
                         .font(.caption)
                 }
             }
@@ -172,82 +185,3 @@ struct HistoryView: View {
     }
 }
 
-class HealthManager: ObservableObject {
-    let healthStore = HKHealthStore()
-    
-    @Published var steps: Int = 0
-    @Published var distance: Double = 0.0
-    @Published var sleep: Double = 0.0
-    
-    func requestAuthorization() {
-        let types: Set = [
-            HKQuantityType(.stepCount),
-            HKQuantityType(.distanceWalkingRunning),
-            HKCategoryType(.sleepAnalysis)
-        ]
-        
-        healthStore.requestAuthorization(toShare: nil, read: types) { success, error in
-            if success {
-                print("HealthKit authorized")
-            }
-        }
-    }
-    
-    func fetchTodayData() {
-        fetchSteps()
-        fetchDistance()
-        fetchSleep()
-    }
-    
-    func fetchSteps() {
-        let type = HKQuantityType(.stepCount)
-        let now = Date()
-        let startOfDay = Calendar.current.startOfDay(for: now)
-        let predicate = HKQuery.predicateForSamples(withStart: startOfDay, end: now)
-        
-        let query = HKStatisticsQuery(quantityType: type, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
-            guard let sum = result?.sumQuantity() else { return }
-            let steps = Int(sum.doubleValue(for: .count()))
-            DispatchQueue.main.async {
-                self.steps = steps
-            }
-        }
-        healthStore.execute(query)
-    }
-    
-    func fetchDistance() {
-        let type = HKQuantityType(.distanceWalkingRunning)
-        let now = Date()
-        let startOfDay = Calendar.current.startOfDay(for: now)
-        let predicate = HKQuery.predicateForSamples(withStart: startOfDay, end: now)
-        
-        let query = HKStatisticsQuery(quantityType: type, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
-            guard let sum = result?.sumQuantity() else { return }
-            let distance = sum.doubleValue(for: .meterUnit(with: .kilo))
-            DispatchQueue.main.async {
-                self.distance = distance
-            }
-        }
-        healthStore.execute(query)
-    }
-    
-    func fetchSleep() {
-        let type = HKCategoryType(.sleepAnalysis)
-        let now = Date()
-        let startOfDay = Calendar.current.startOfDay(for: now)
-        let predicate = HKQuery.predicateForSamples(withStart: startOfDay, end: now)
-        
-        let query = HKSampleQuery(sampleType: type, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, _ in
-            guard let samples = samples as? [HKCategorySample] else { return }
-            
-            let totalSleep = samples.reduce(0.0) { total, sample in
-                total + sample.endDate.timeIntervalSince(sample.startDate)
-            }
-            
-            DispatchQueue.main.async {
-                self.sleep = totalSleep / 3600
-            }
-        }
-        healthStore.execute(query)
-    }
-}

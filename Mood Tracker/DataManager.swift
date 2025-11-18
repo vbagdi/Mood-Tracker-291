@@ -7,6 +7,7 @@ struct DailyData: Codable, Identifiable {
     var steps: Int
     var distance: Double
     var sleep: Double
+    var flightsClimbed: Int
     var mood: Int
     var userId: String
     var userName: String
@@ -29,6 +30,7 @@ class DataManager: ObservableObject {
             steps: data.steps,
             distance: data.distance,
             sleep: data.sleep,
+            flightsClimbed: data.flightsClimbed,  // ADD THIS
             mood: data.mood,
             userId: userId,
             userName: data.userName
@@ -43,6 +45,7 @@ class DataManager: ObservableObject {
         uploadToFirebase(newData)
     }
     
+    
     private func uploadToFirebase(_ data: DailyData) {
         let dataDict: [String: Any] = [
             "id": data.id.uuidString,
@@ -50,6 +53,7 @@ class DataManager: ObservableObject {
             "steps": data.steps,
             "distance": data.distance,
             "sleep": data.sleep,
+            "flightsClimbed": data.flightsClimbed,
             "mood": data.mood,
             "userId": data.userId,
             "userName": data.userName
@@ -74,6 +78,48 @@ class DataManager: ObservableObject {
            let decoded = try? JSONDecoder().decode([DailyData].self, from: data) {
             dailyData = decoded
         }
+    }
+    func fetchAllDataFromFirebase() {
+        db.collection("moodData")
+            .order(by: "date", descending: false)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching: \(error)")
+                    return
+                }
+                
+                guard let documents = snapshot?.documents else { return }
+                
+                let fetchedData = documents.compactMap { doc -> DailyData? in
+                    let data = doc.data()
+                    guard let id = data["id"] as? String,
+                          let timestamp = data["date"] as? Timestamp,
+                          let steps = data["steps"] as? Int,
+                          let distance = data["distance"] as? Double,
+                          let sleep = data["sleep"] as? Double,
+                          let flightsClimbed = data["flightsClimbed"] as? Int,
+                          let mood = data["mood"] as? Int,
+                          let userId = data["userId"] as? String,
+                          let userName = data["userName"] as? String
+                    else { return nil }
+                    
+                    return DailyData(
+                        id: UUID(uuidString: id) ?? UUID(),
+                        date: timestamp.dateValue(),
+                        steps: steps,
+                        distance: distance,
+                        sleep: sleep,
+                        flightsClimbed: flightsClimbed,
+                        mood: mood,
+                        userId: userId,
+                        userName: userName
+                    )
+                }
+                
+                DispatchQueue.main.async {
+                    self.dailyData = fetchedData
+                }
+            }
     }
     
     private func saveUserIdToDevice() {

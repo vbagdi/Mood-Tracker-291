@@ -42,6 +42,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 steps: healthManager.steps,
                 distance: healthManager.distance,
                 sleep: healthManager.sleep,
+                flightsClimbed: healthManager.flightsClimbed,
                 mood: selectedMood == 0 ? 3 : selectedMood,
                 userId: "",
                 userName: userName

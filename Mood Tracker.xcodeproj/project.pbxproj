@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		E37D885C2ECBE4950006FBC6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E37D885B2ECBE4950006FBC6 /* GoogleService-Info.plist */; };
 		E37D885F2ECBE77F0006FBC6 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E37D885E2ECBE77F0006FBC6 /* FirebaseFirestore */; };
+		E37D88632ECC01ED0006FBC6 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E37D88622ECC01ED0006FBC6 /* ChartView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +34,7 @@
 		E37B48F42ECBD87100D087A9 /* Mood TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Mood TrackerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E37B48FE2ECBD87100D087A9 /* Mood TrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Mood TrackerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E37D885B2ECBE4950006FBC6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E37D88622ECC01ED0006FBC6 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -82,6 +84,7 @@
 		E37B48DD2ECBD86F00D087A9 = {
 			isa = PBXGroup;
 			children = (
+				E37D88622ECC01ED0006FBC6 /* ChartView.swift */,
 				E37B48E82ECBD86F00D087A9 /* Mood Tracker */,
 				E37B48F72ECBD87100D087A9 /* Mood TrackerTests */,
 				E37B49012ECBD87100D087A9 /* Mood TrackerUITests */,
@@ -249,6 +252,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E37D88632ECC01ED0006FBC6 /* ChartView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
