@@ -11,6 +11,7 @@ struct DailyData: Codable, Identifiable {
     var mood: Int
     var userId: String
     var userName: String
+    var manualSleepEntry: Bool = false  // ADD THIS
 }
 
 class DataManager: ObservableObject {

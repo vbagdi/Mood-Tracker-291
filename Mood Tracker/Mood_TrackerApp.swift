@@ -45,7 +45,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 flightsClimbed: healthManager.flightsClimbed,
                 mood: selectedMood == 0 ? 3 : selectedMood,
                 userId: "",
-                userName: userName
+                userName: userName,
+                manualSleepEntry: false  // ADD THIS
+
             )
             
             DataManager().saveData(data)
