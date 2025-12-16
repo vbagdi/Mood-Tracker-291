@@ -1,3 +1,8 @@
+
+
+<img width="203" height="382" alt="moodtracker" src="https://github.com/user-attachments/assets/303a27c1-40c7-4ba2-bf79-677eb354fdf7" />
+
+
 # Mood Tracker iOS App
 
 An iOS application that helps users understand their daily wellbeing by tracking behavioral data and predicting mood patterns using machine learning.
